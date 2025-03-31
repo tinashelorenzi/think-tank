@@ -3,18 +3,20 @@ const express = require('express');
 const cors = require('cors');
 const AdminJS = require('adminjs');
 const AdminJSExpress = require('@adminjs/express');
+const AdminJSSequelize = require('@adminjs/sequelize');
 const session = require('express-session');
 const { sequelize } = require('./models');
 const routes = require('./routes');
 const { authenticateAdmin } = require('./middleware/auth');
 
+// Register the Sequelize adapter
+AdminJS.registerAdapter(AdminJSSequelize);
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Basic middleware
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Session configuration
 app.use(session({
@@ -93,14 +95,23 @@ const adminJs = new AdminJS({
       },
     },
     {
-      resource: require('./models/Score'),
+      resource: require('./models/Question'),
       options: {
         navigation: {
           name: 'Course Management',
-          icon: 'Star',
+          icon: 'HelpCircle',
         },
       },
     },
+    {
+      resource: require('./models/QuizAttempt'),
+      options: {
+        navigation: {
+          name: 'Course Management',
+          icon: 'Activity',
+        },
+      },
+    }
   ],
   branding: {
     companyName: 'The ThinkTank LMS',
@@ -124,7 +135,12 @@ const adminRouter = AdminJSExpress.buildAuthenticatedRouter(
   }
 );
 
+// Mount AdminJS router first
 app.use(adminJs.options.rootPath, adminRouter);
+
+// Body parser middleware after AdminJS
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // API Routes
 app.use('/api', routes);
@@ -141,14 +157,18 @@ const startServer = async () => {
     await sequelize.authenticate();
     console.log('Database connection established successfully.');
     
-    await sequelize.sync({ alter: process.env.NODE_ENV === 'development' });
+    // Sync database (create tables if they don't exist)
+    await sequelize.sync();
+    console.log('Database synchronized successfully.');
     
+    // Start the server
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
       console.log(`Admin panel available at http://localhost:${PORT}/admin`);
     });
   } catch (error) {
     console.error('Unable to start server:', error);
+    process.exit(1);
   }
 };
 
