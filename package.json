@@ -2,44 +2,21 @@
   "name": "think-tank",
   "version": "1.0.0",
   "description": "A modern Learning Management System with gamification features",
-  "main": "src/server.js",
+  "private": true,
+  "workspaces": [
+    "backend"
+  ],
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/tinashelorenzi/think-tank.git"
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev",
+    "test": "cd backend && npm test"
   },
   "keywords": [
     "lms",
     "education",
     "learning",
-    "gamification",
-    "courses"
+    "gamification"
   ],
   "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/tinashelorenzi/think-tank/issues"
-  },
-  "homepage": "https://github.com/tinashelorenzi/think-tank#readme",
-  "dependencies": {
-    "@adminjs/express": "^5.1.0",
-    "@adminjs/sequelize": "^3.0.0",
-    "adminjs": "^6.8.7",
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "express-formidable": "^1.2.0",
-    "express-session": "^1.17.3",
-    "jsonwebtoken": "^9.0.0",
-    "mysql2": "^3.2.0",
-    "sequelize": "^6.30.0"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.22"
-  }
-}
+  "license": "ISC"
+} 
