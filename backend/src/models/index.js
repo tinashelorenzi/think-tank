@@ -9,10 +9,23 @@ const Quiz = require('./Quiz');
 const Question = require('./Question');
 const QuizAttempt = require('./QuizAttempt');
 const Score = require('./Score');
+const Discussion = require('./Discussion');
 
 // User - Course relationships
-Course.belongsTo(User, { as: 'instructor' });
-User.hasMany(Course, { as: 'instructedCourses' });
+Course.belongsTo(User, { as: 'instructor', foreignKey: 'instructorId' });
+User.hasMany(Course, { as: 'teachingCourses', foreignKey: 'instructorId' });
+Course.belongsToMany(User, { 
+  through: 'CourseEnrollments',
+  as: 'students',
+  foreignKey: 'courseId',
+  otherKey: 'userId'
+});
+User.belongsToMany(Course, {
+  through: 'CourseEnrollments',
+  as: 'enrolledCourses',
+  foreignKey: 'userId',
+  otherKey: 'courseId'
+});
 
 // User - Cohort relationships
 Cohort.belongsTo(User, { as: 'instructor' });
@@ -25,8 +38,8 @@ Course.hasMany(Cohort);
 Cohort.belongsTo(Course);
 
 // Course - Content relationships
-Course.hasMany(Content);
-Content.belongsTo(Course);
+Course.hasMany(Content, { foreignKey: 'courseId' });
+Content.belongsTo(Course, { foreignKey: 'courseId' });
 
 // Course - Assignment relationships
 Course.hasMany(Assignment);
@@ -35,7 +48,7 @@ Assignment.belongsTo(Course);
 // Assignment - Submission relationships
 Assignment.hasMany(Submission);
 Submission.belongsTo(Assignment);
-Submission.belongsTo(User, { as: 'student' });
+Submission.belongsTo(User, { as: 'student', foreignKey: 'userId' });
 
 // Course - Quiz relationships
 Course.hasMany(Quiz);
@@ -59,6 +72,12 @@ Score.belongsTo(User);
 Cohort.hasMany(Score);
 Score.belongsTo(Cohort);
 
+// Discussion associations
+Discussion.belongsTo(Course, { foreignKey: 'courseId' });
+Discussion.belongsTo(User, { foreignKey: 'userId' });
+Course.hasMany(Discussion, { foreignKey: 'courseId' });
+User.hasMany(Discussion, { foreignKey: 'userId' });
+
 module.exports = {
   sequelize,
   User,
@@ -70,5 +89,6 @@ module.exports = {
   Quiz,
   Question,
   QuizAttempt,
-  Score
+  Score,
+  Discussion
 }; 
